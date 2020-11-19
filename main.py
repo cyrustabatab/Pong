@@ -27,7 +27,7 @@ ball_speed_y = 7
 
 
 def ball_movement():
-    global ball_speed_x,ball_speed_y,left_score,right_score,left_score_text,right_score_text,start_time,player_speed
+    global ball_speed_x,ball_speed_y,left_score,right_score,left_score_text,right_score_text,start_time,player_speed,game_over,winner_text
     ball.x += ball_speed_x
 
     ball.y += ball_speed_y
@@ -56,9 +56,15 @@ def ball_movement():
         score_sound.play()
         if ball_speed_x < 0:
             right_score += 1
+            if right_score == 5:
+                winner_text = font.render("YOU WIN!",True,light_grey)
+                game_over = True
             right_score_text = font.render(f"{right_score}",True,light_grey)
         else:
             left_score += 1
+            if left_score == 5:
+                winner_text = font.render("COMPUTER WINS",True,light_grey)
+                game_over = True
             left_score_text = font.render(f"{left_score}",True,light_grey)
         
         start_time = pygame.time.get_ticks()
@@ -175,8 +181,8 @@ start_ball_speed = 7
 
 pong_sound = pygame.mixer.Sound(os.path.join('assets','pong.ogg'))
 score_sound = pygame.mixer.Sound(os.path.join('assets','score.ogg'))
-
-
+winner_text = None
+game_over = False
 start_time = pygame.time.get_ticks()
 while True:
 
@@ -184,6 +190,16 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             sys.exit()
+        elif game_over and event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_RETURN:
+                left_score = right_score = 0
+                left_score_text = font.render('0',True,light_grey)
+                right_score_text = font.render('0',True,light_grey)
+                player.centery =  opponent.centery = SCREEN_HEIGHT//2
+                winner_text = None
+                game_over = False
+                start_time = pygame.time.get_ticks()
+
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_DOWN:
                 player_y_speed += player_speed
@@ -199,10 +215,10 @@ while True:
 
      
 
-    
-    player_animation()
-    opponent_ai()
-    ball_movement()
+    if not game_over: 
+        player_animation()
+        opponent_ai()
+        ball_movement()
 
     
 
@@ -214,9 +230,10 @@ while True:
     screen.blit(left_score_text,(SCREEN_WIDTH/2 - left_score_text.get_width() - 10,5))
     screen.blit(right_score_text,(SCREEN_WIDTH/2 + 10 ,5))
 
-    if start_time:
+    if start_time and not game_over:
         ball_start()
-
+    if winner_text:
+        screen.blit(winner_text,(SCREEN_WIDTH//2 - winner_text.get_width()//2,SCREEN_HEIGHT//2 - winner_text.get_height()//2 - 40))
     pygame.display.update()
     clock.tick(FPS)
 
