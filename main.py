@@ -75,28 +75,37 @@ def ball_movement():
 def ball_movement_2():
     global ball_speed_x,ball_speed_y,left_score,right_score,left_score_text,right_score_text,start_time,player_speed
     ball.x += ball_speed_x
+    set_ball_right_to_paddle_left = False  
+    set_ball_left_to_paddle_right = False  
     
+    collided_x = False
     if ball.colliderect(player):
         pong_sound.play()
         ball_speed_x *= -1
-        ball.right = player.left
+        ball_speed_x *= 1.05
+        set_ball_right_to_paddle_left = True
+        #ball.right = player.left
+        collided_x = True
     elif ball.colliderect(opponent):
         pong_sound.play()
         ball_speed_x *= -1
+        ball_speed_x *= 1.05
+        set_ball_left_to_paddle_right = True  
         ball.left = opponent.right
+        collided_x = True
     
     ball.y += ball_speed_y
     if ball.bottom >= SCREEN_HEIGHT or ball.top <= 0:
         ball_speed_y *= -1
 
-    if ball.colliderect(player):
+    if not collided_x and ball.colliderect(player):
         pong_sound.play()
         if ball_speed_y < 0:
             ball.top = player.bottom
         else:
             ball.bottom = player.top
         ball_speed_y *= -1
-    elif ball.colliderect(opponent):
+    elif not collided_x and ball.colliderect(opponent):
         pong_sound.play()
         if ball_speed_y < 0:
             ball.top = opponent.bottom
@@ -104,7 +113,12 @@ def ball_movement_2():
             ball.bottom = opponent.top
         ball_speed_y *= -1
     
+    if set_ball_right_to_paddle_left:
+        ball.right = player.left
 
+    if set_ball_left_to_paddle_right:
+        ball.left = opponent.right
+        
     if ball.left <= 0 or ball.right >= SCREEN_WIDTH:
         score_sound.play()
         if ball_speed_x < 0:
@@ -218,7 +232,7 @@ while True:
     if not game_over: 
         player_animation()
         opponent_ai()
-        ball_movement()
+        ball_movement_2()
 
     
 
