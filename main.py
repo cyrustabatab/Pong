@@ -86,18 +86,25 @@ def ball_movement_2():
     if ball.colliderect(player):
         pong_sound.play()
         ball_speed_x *= -1
-        ball_speed_x *= 1.05
+        
+        if ball_speed_x < 0:
+            ball_speed_x = max(ball_speed_x * 1.05,-25)
+        else:
+            ball_speed_x = min(ball_speed_x * 1.05,25)
         set_ball_right_to_paddle_left = True
         #ball.right = player.left
         collided_x = True
     elif ball.colliderect(opponent):
         pong_sound.play()
         ball_speed_x *= -1
-        ball_speed_x *= 1.05
+
+        if ball_speed_x < 0:
+            ball_speed_x = max(ball_speed_x * 1.05,-35)
+        else:
+            ball_speed_x = min(ball_speed_x * 1.05,35)
         set_ball_left_to_paddle_right = True  
         ball.left = opponent.right
         collided_x = True
-    
     ball.y += ball_speed_y
     if ball.bottom >= SCREEN_HEIGHT or ball.top <= 0:
         ball_speed_y *= -1
